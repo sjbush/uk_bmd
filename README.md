@@ -5,13 +5,67 @@ The raw data (not included in this repo) are sourced from the [UK Local BMD](htt
 
 The two subdirectories in this repo, 'dataset_B' and 'dataset_D', represent data processed from 23,395,527 birth and 9,823,051 death records, respectively, with the contents of each file described in the paper. These include the total count of each name registered per year. Birth records span the period 1837 - 2014 and death records 1733 - 2009, in both cases representing an assumed unbiased population sample.
 
-**IMPORTANT**: the years shown in both datasets represent the known or imputed year of birth, and in this respect, the two datasets are directly comparable. To repeat: the years shown in the 'death' dataset do not represent the year of death; they represent the imputed year of birth (i.e. year of death - age at death). Unfortunately, age at death was not provided for records in Cumbria, Shropshire, the West Midlands and the vast majority of data from North Wales, and as such, no (or very few) death records could be used from those regions.
+**IMPORTANT**: the years shown in both datasets represent the known or imputed year of birth, and in this respect, the two datasets are directly comparable. To repeat: the years shown in the 'death' dataset do not represent the year of death; they represent the year of birth (i.e. year of death - age at death, unless otherwise specified). Unfortunately, age at death was not provided for records in Cumbria, Shropshire, the West Midlands and the vast majority of data from North Wales, and as such, no (or very few) death records could be used from those regions.
 
 # A Note on the Name
 
 The "UK BMD" is somewhat misleadingly named as it does not contain records from Scotland or Northern Ireland. This is due to differences in their legislative frameworks and history of civil registration relative to England and Wales. In the latter, civil registration began on the 1st July 1837 although only became compulsory from 1st January 1875 with the passing of the Births and Deaths Registration Act 1874.
 
 Prior to 1837, records of baptisms, marriages, and funerals can be found in local parish registers although as these were maintained by Anglican clergy, they wouldn’t have included non-conformists (among others).
+
+# Record Parsing Criteria
+
+The BMD records contain both 'forename(s)' and 'surname' fields, with the latter always capitalised.
+
+These scripts parse the 'forename(s)' field to produce one 'first name' and zero or more 'middle names' on the basis that spaces separate individual names.
+
+The name before the first space was considered the first name and all subsequent names, space delimited, were considered middle names. For example, _Ellen Sarah Jane SMITH_ has the first name _Ellen_, two middle names, _Sarah_ and _Jane_, and the surname _SMITH_ but _Sarahjane Ellen SMITH_ has one first name, _Sarahjane_, one middle name, _Ellen_, and one surname, _SMITH_.
+
+Nevertheless, there are exceptions to this. The records were parsed using a small number of criteria, some to exclude them from consideration and others to make light edits. These are as follows:
+
+## Criteria for exclusion
+
+Records were excluded if the 'forename(s)' field:
+* did not contain at least one alphabetical character (i.e. A to Z, irrespective of case)
+* contained a number
+* contained either of the symbols: ? & ( ) [ ]
+  * these generally denote ambiguous transcription or a description appended to the name, such as _John Son of William & Mary_
+* exactly matched any of the following phrases: Newborn, Not Named, Un-named, Unnamed, Unknown, Undetermined, No Name, No First Name, Name Not Given, Registered, Re-registered, Infant Girl, Infant Boy, Infant Female, Infant Male, Male Infant, Female Infant, Baby Female, Baby Male, Unchristened, Deceased
+* contained the clause _" of "_ or _" Of "_, noting spaces between the word
+	* this invariably matches a descriptive phrase instead of a name, such as in birth records beginning _Child of_, _Son of_ or _Daughter of_, and in death records beginning _Late of_
+* for some regions (Bath, Cumbria, Shropshire, West Midlands, Wiltshire, Yorkshire), records had a unique reference number but for others (Berkshire, Cheshire, Kingston, Lancashire, North Wales, Staffordshire) multiple different records could share the same reference. In this case, the reference number refers to a processing batch, often (but not always) of around five records at a time.
+	* for those regions where there is meant to be a one-to-one correspondence between record and reference number, what do we do when more than one record has that number?
+	* we could exclude them as a matter of course, but on manual inspection we find there is a good reason why this has happened
+	* it is either because the name is complex and there is ambiguity in the "forenames" and "surname" fields, *or* because the record did not include all names *or* (in the case of death records) because the record included prefered names as opposed to the literal birth name
+	* e.g. _Brian Armstrong- CLIFFORD_ and _Brian ARMSTRONG-CLIFFORD_ - an example of the first
+	* _John ALEXANDER_ and _Jack ALEXANDER_ - an example of the second
+	* _Katherine Helen ANGUS_ and _Kit ANGUS_, and _Henry Frederick John ANDREWS_ and _Harry ANDREWS_, respectively - both examples of the third (and the second)
+	* only manual inspection can rescue records of the second and third category, but we can automate rescue of the first
+	* the way we do this is to convert all possible names associated with a given reference into a gapless capitalised string, and then count the number of strings associated with that reference
+	* if there is only one string (e.g. _BRIANARMSTRONG-CLIFFORD_), then what this means is that irrespective of the number of records associated with that reference ID, the names are the same
+	* in that case, we allow one of these records to be processed, randomly chosen, and exclude the others
+
+## Criteria for editing
+
+Records were edited according to the following criteria:
+* if the forenames field began with either of the following - _Colonel, Corporal, Countness, Doctor, General, Lady, Lord, Major, Prince, Reverend, Sergeant_ - the text was removed
+	* this is a unique complication with death records: they sometimes contain titles which must first be omitted, otherwise they may mistakenly be interpreted as names
+* if the forenames field had one first name ending in a hyphen and only one middle name, then the latter is appended to the former - unless the middle name is an initial (because there is not enough information to go on)
+	* e.g. _Ann- Marie FLYNN_ is edited to _Ann-Marie FLYNN_
+* if the forenames field had one middle name and that name is "-" then it is treated as a placeholder character meaning "not applicable", and so removed
+	* e.g. _Ann - FLYNN_ is edited to _Ann FLYNN_
+* if the middle name contains multiple hyphens, e.g. _E-----_, then remove all of them and leave only the initial
+	* this is a sign that the transcription was incomplete
+* if either first or middle name was a conventional abbreviation, it was expanded, and if an obvious typo, amended (noting the subjective nature of this edit)
+	* these are: _Wm_ to _William_, _Edwd_ to _Edward_, _Geo_ to _George_
+	* for a full list, see the two-column file "names_to_revise.txt"; the leftmost column is a name as it appears in the BMD, the rightmost how it is amended
+* if the forenames field had multiple middle names, the last of which ended in a hyphen, then we assume that is the first part of a compound surname - unless either middle name is an initial (because there is not enough information to go on) or the surname is already hyphenated
+	* e.g. _Ann Marie Hucklebury- FLYNN_ is edited to _Ann Marie HUCKLEBURY-FLYNN_
+	* note that there are many instances (mostly historical) where a familial surname has been used in a middle name position; we would assume _Ann Marie Hucklebury FLYNN_ (no hyphen) is one of them
+	* further support for the assumption that the last middle name, if ending in a hyphen, is actually a compound surname comes from the presence of multiple people from the same area with the same compound, dying in close proximity (these are probably siblings)
+	* e.g. the deaths of _Courtenay Sandilands Wynell- MAYOW_ and _Robert Lawrence Wynell- MAYOW_
+
+There will inevitably be a number of errors remaining in the final, processed, dataset.
 
 # Scripts
 
