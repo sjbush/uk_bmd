@@ -7,8 +7,10 @@ library(scales)
 
 # plot the % name use in the B vs. D dataset
 
-df<-read.table('C:/Users/sbush/Desktop/bmd_as_resource/total_counts_per_year_for_names_in_B_and_D.txt',sep='\t',quote='',header=T)
-fig2 <- ggplot() + geom_point(data = df, aes(x = Total.B, y = Total.D)) + xlab('Total count per name (birth records)') + ylab('Total count per name (death records)') + theme_bw() + scale_x_continuous(labels = scientific) + scale_y_continuous(labels = scientific)
+df<-read.table('C:/Users/User/Desktop/bmd_as_resource/total_counts_per_year_for_names_in_B_and_D.txt',sep='\t',quote='',header=T)
+fig2 <- ggplot() + geom_point(data = df, aes(x = Total.B, y = Total.D), size = 0.7) + xlab('Total count per name (birth records)') + ylab('Total count per name (death records)') + theme_bw() + scale_x_log10(limits=c(1,1000000),breaks=c(1,10,100,1000,10000,100000,1000000),labels=c(1,10,100,1000,"10,000","100,000","1,000,000")) + scale_y_log10(limits=c(1,1000000),breaks=c(1,10,100,1000,10000,100000,1000000),labels=c(1,10,100,1000,"10,000","100,000","1,000,000"))
+ggsave(file = 'C:/Users/User/Desktop/bmd_as_resource/Documents/Figure2.jpeg', plot = fig2, width = 7, height = 7)
+
 cor.test(df$Total.B,df$Total.D,method=c('pearson'))
 
 =cut
