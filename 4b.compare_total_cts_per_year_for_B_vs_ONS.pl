@@ -1,7 +1,7 @@
 =head
 
 PURPOSE: we wish to compare the total counts per name in the B dataset vs. the ONS dataset. This analysis is restricted to the years the two have a meaningful number of records in common, 1996-2007 (as dataset B has >10,000 records per year for each of these years).
-It was not possible to compare the D with the ONS dataset as dataset D only contains 688 records in the period 1996-2009.
+It was not possible to compare the D with the ONS dataset as dataset D only contains 730 records in the period 1996-2009.
 
 AFTER USAGE:
 
@@ -10,8 +10,10 @@ library(scales)
 
 # plot the % name use in the B vs. UK ONS dataset
 
-df<-read.table('C:/Users/sbush/Desktop/bmd_as_resource/total_counts_per_year_for_names_in_B_and_ONS.txt',sep='\t',quote='',header=T)
-fig3 <- ggplot() + geom_point(data = df, aes(x = Total.B, y = Total.ONS)) + xlab('Total count per name (birth records)') + ylab('Total count per name (UK ONS)') + theme_bw() + scale_x_continuous(labels = scientific) + scale_y_continuous(labels = scientific)
+df<-read.table('C:/Users/User/Desktop/bmd_as_resource/total_counts_per_year_for_names_in_B_and_ONS.txt',sep='\t',quote='',header=T)
+fig3 <- ggplot() + geom_point(data = df, aes(x = Total.B, y = Total.ONS), size = 0.7) + xlab('Total count per name (birth records)') + ylab('Total count per name (UK ONS)') + theme_bw() + scale_x_log10(limits=c(1,100000),breaks=c(1,10,100,1000,10000,100000),labels=c(1,10,100,1000,"10,000","100,000")) + scale_y_log10(limits=c(1,100000),breaks=c(1,10,100,1000,10000,100000),labels=c(1,10,100,1000,"10,000","100,000"))
+ggsave(file = 'C:/Users/User/Desktop/bmd_as_resource/Documents/Figure3.jpeg', plot = fig3, width = 7, height = 7)
+
 cor.test(df$Total.B,df$Total.ONS,method=c('pearson'))
 
 =cut
