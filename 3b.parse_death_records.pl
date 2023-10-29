@@ -3,24 +3,38 @@
 AFTER USAGE:
 
 library(ggplot2)
+library(ggpubr)
 
 # plot the total number of B and D records per year
 
-df_b<-read.table('C:/Users/sbush/Desktop/bmd_as_resource/dataset_B/summary_of_records_per_year.txt',sep='\t',quote='',header=T)
-df_d<-read.table('C:/Users/sbush/Desktop/bmd_as_resource/dataset_D/summary_of_records_per_year.txt',sep='\t',quote='',header=T)
-fig1 <- ggplot() + geom_line(data = df_b, aes(x = Year, y = No..of.records.with.a.forename), size = 0.8, linetype = 'solid') + geom_line(data = df_d, aes(x = Year, y = No..of.records.with.a.forename), size = 0.8, linetype = 'dashed') + xlab('Year') + ylab('No. of records') + scale_x_continuous(limits=c(1730,2020)) + theme_bw()
+df_b<-read.table('C:/Users/User/Desktop/bmd_as_resource/dataset_B/summary_of_records_per_year.txt',sep='\t',quote='',header=T)
+df_d<-read.table('C:/Users/User/Desktop/bmd_as_resource/dataset_D/summary_of_records_per_year.txt',sep='\t',quote='',header=T)
+fig1 <- ggplot() + geom_line(data = df_b, aes(x = Year, y = No..of.records.with.a.forename), linewidth = 0.7, linetype = 'solid') + geom_line(data = df_d, aes(x = Year, y = No..of.records.with.a.forename), linewidth = 0.7, linetype = 'dashed') + xlab('Year') + ylab('No. of records (thousands)') + scale_x_continuous(limits=c(1730,2020)) + scale_y_continuous(expand=c(0,5),limits=c(0,255000),breaks=c(0,50000,100000,150000,200000,250000),labels=c(0,50,100,150,200,250)) + theme_bw()
+ggsave(file = 'C:/Users/User/Desktop/bmd_as_resource/Documents/Figure1.jpeg', plot = fig1, width = 7, height = 7)
+
+# plot the gender ratio of birth records per year - excessive deviations from a M/F ratio of 1.03-1.06 are a sign of non-representative coverage
+
+df<-read.table('C:/Users/User/Desktop/bmd_as_resource/dataset_B/summary_of_records_per_year.txt',sep='\t',quote='',header=T)
+df.sub<-subset(df,df$No..of.records.with.a.forename > 10000)
+df<-df.sub
+fig4a <- ggplot() + geom_line(data = df, aes(x = Year, y = Gender.ratio.of..male.mostly.male...female...mostly.female..forename.records), linewidth = 0.7) + ggtitle('A') + xlab('Year') + ylab('Ratio of male to female birth records') + scale_x_continuous(limits=c(1830,2020)) + scale_y_continuous(limits=c(0.95,1.1)) + theme_bw() + annotate("rect", xmin = 1830, xmax = 2020, ymin = 1.03, ymax = 1.06, alpha = 0.3, fill = "grey")
 
 # plot the gender ratio of death records per year
 
-df<-read.table('C:/Users/sbush/Desktop/bmd_as_resource/dataset_D/summary_of_records_per_year.txt',sep='\t',quote='',header=T)
+df<-read.table('C:/Users/User/Desktop/bmd_as_resource/dataset_D/summary_of_records_per_year.txt',sep='\t',quote='',header=T)
 df.sub<-subset(df,df$No..of.records.with.a.forename > 1000)
 df<-df.sub
-fig4b <- ggplot() + geom_line(data = df, aes(x = Year, y = Gender.ratio.of..male.mostly.male...female...mostly.female..forename.records), size = 0.8) + xlab('Year') + ylab('Ratio of male to female death records') + scale_x_continuous(limits=c(1730,2020)) + scale_y_continuous(limits=c(0.7,1.7)) + theme_bw()
+fig4b <- ggplot() + geom_line(data = df, aes(x = Year, y = Gender.ratio.of..male.mostly.male...female...mostly.female..forename.records), linewidth = 0.7) + ggtitle('B') + xlab('Year') + ylab('Ratio of male to female death records') + scale_x_continuous(limits=c(1730,2009)) + scale_y_continuous(limits=c(0.7,1.7)) + theme_bw() + annotate("rect", xmin = 1730, xmax = 2009, ymin = 1.03, ymax = 1.06, alpha = 0.3, fill = "grey")
+
+# combine the two plots
+
+fig4<-ggarrange(fig4a, fig4b, nrow=1, ncol=2)
+ggsave(file = 'C:/Users/User/Desktop/bmd_as_resource/Documents/Figure4.jpeg', plot=fig4, width = 14, height = 7)
 
 # plot the % of death records with a forename of undetermined gender
 
-df<-read.table('C:/Users/sbush/Desktop/bmd_as_resource/dataset_D/summary_of_records_per_year.txt',sep='\t',quote='',header=T)
-fig5b <- ggplot() + geom_line(data = df, aes(x = Year, y = X..of.records.with.a.gender.undetermined.forename), size = 0.8) + xlab('Year') + ylab('% of death records with a gender-undetermined forename') + scale_x_continuous(limits=c(1830,2020)) + theme_bw()
+df<-read.table('C:/Users/User/Desktop/bmd_as_resource/dataset_D/summary_of_records_per_year.txt',sep='\t',quote='',header=T)
+fig5b <- ggplot() + geom_line(data = df, aes(x = Year, y = X..of.records.with.a.gender.undetermined.forename), linewidth = 0.7) + xlab('Year') + ylab('% of death records with a gender-undetermined forename') + scale_x_continuous(limits=c(1830,2020)) + theme_bw()
 
 =cut
 
@@ -30,10 +44,12 @@ use Acme::Tools qw(avg median sum);
 use Unicode::Normalize;
 
 # REQUIREMENTS
-my $in_dir = 'BMD-08.06.23/D'; # manually downloaded
+my $in_dir = 'BMD-13.09.23/D'; # manually downloaded
 my $gender = 'gender_prediction_of_names_using_merged_dataset.txt'; # from 2.predict_gender_of_name_by_combining_datasets.pl
+my $edits  = 'names_to_revise.txt'; # manually created after review of possible_typos.txt, created by 6.predict_typos.pl. This file is created AFTER running scripts 3a.parse_birth_records.pl and 3b.parse_death_records.pl; its input is fed back into these scripts to run it a second time
 if (!(-d($in_dir))) { print "ERROR: cannot find $in_dir\n"; exit 1; }
 if (!(-e($gender))) { print "ERROR: cannot find $gender\n"; exit 1; }
+if (!(-e($edits)))  { print "ERROR: cannot find $edits\n";  exit 1; }
 
 # PARAMETERS
 my $min_records = 1000;
@@ -70,7 +86,7 @@ print OUT_ALL_FIRST    	  "First name\tGender\tTotal no. of records with this fi
 print OUT_ALL_MIDDLE   	  "Middle name\tGender\tTotal no. of records with this middle name\t% of total\n";
 print OUT_ALL_FIRST_MIDL  "First name and middle name(s)\tNo. of middle names\tTotal no. of records with this first and middle name(s)\t% of total\tGender of first name\tGender of middle name(s)\n";
 print OUT_ALL_FULL 		  "Full name\tYear\tTotal no. of records with this full name in this year\n";
-print OUT_TOTAL_NAME_FREQ "Name\tGender\tNo. of occurrences as a forename\tNo. of occurrences as a middle name\tNo. of occurrences as a surname\tRatio of number of times this occurs as a surname to the number of times this occurs as a forename\tNo. of years in which this is used either as a forename or middle name\tYears in which this is used either as a forename or middle name\n";
+print OUT_TOTAL_NAME_FREQ "Name\tGender\tNo. of occurrences as a forename\tNo. of occurrences as a middle name\tNo. of occurrences as a surname\tTotal no. of occurrences (in any position)\t% of occurrences as a forename\t% of occurrences as a middle name\t% of occurrences as a surname\tRatio of number of times this occurs as a surname to the number of times this occurs as a forename\tNo. of years in which this is used either as a forename or middle name\tYears in which this is used either as a forename or middle name\n";
 
 # STORE THE GENDER ASSOCIATED WITH EACH NAME
 my %genders = ();
@@ -82,6 +98,35 @@ while(<IN>)
 	  $genders{$name} = $gender;
 	}
 close(IN) or die $!;
+
+# STORE NAMES TO REVISE
+my %edits = (); my %edits_seen = ();
+open(IN,$edits) or die $!;
+while(<IN>)
+	{ my $line = $_; chomp($line); $line =~ s/[\r\n]//g;
+	  my @line = split(/\t/,$line);
+	  my $was = $line[0]; my $now = '';
+	  if (defined($line[1])) { $now = $line[1]; }
+	  $edits{$was} = $now;
+	  $edits_seen{$was}{$now}++;
+	}
+close(IN) or die $!;
+my @was = ();
+while((my $was,my $now)=each(%edits_seen))
+	{ push(@was,$was); }
+my @sorted_was = sort {$a cmp $b} @was;
+my $errors_in_edits_file = 0;
+foreach my $was (@sorted_was)
+	{ my $num = scalar keys %{$edits_seen{$was}};
+	  if ($num > 1)
+		{ print "ERROR: the name $was appears $num times in $edits:\n";
+		  while((my $now,my $irrel)=each(%{$edits_seen{$was}}))
+			{ print "$was to $now\n";
+			}
+		  $errors_in_edits_file++;
+		}
+	}
+exit 1 if ($errors_in_edits_file > 0);
 
 # STORE FREQUENCY OF NAMES PER YEAR, IN BOTH ABSOLUTE AND RELATIVE TERMS, FROM THE DEATH RECORDS
 my %records_per_year = ();
@@ -144,6 +189,45 @@ foreach my $region (@sorted_regions)
 			  close(IN) or die $!;
 			}
 		}
+	  my %override_allowed = ();
+	  while((my $region,my $irrel)=each(%ref_nums))
+		{ my @reference = ();
+		  while((my $reference,my $irrel)=each(%{$ref_nums{$region}}))
+			{ push(@reference,$reference); }
+		  my @sorted_reference = sort {$a cmp $b} @reference;
+		  foreach my $reference (@sorted_reference)
+			{ my $num_records = scalar keys %{$ref_nums{$region}{$reference}};
+			  next if ($num_records == 1);
+			  my @excl = ();
+			  while((my $excl,my $irrel)=each(%{$ref_nums{$region}{$reference}}))
+				{ push(@excl,$excl); }
+			  my @sorted_excl = sort {$a cmp $b} @excl;
+			  my %details_for_this_ref = ();
+			  foreach my $excl (@sorted_excl)
+				{ #print "$reference has $num_records records --> $excl\n";
+				  
+				  # there are many records with the same reference but if we were to manually inspect them we would realise they are variants of the same name
+				  # this is either because the name is complex and there is ambiguity in the "forenames" and "surname" fields, *or* because the record did not include all names *or* (in the case of death records) because the record included prefered names as opposed to the literal birth name
+				  # e.g. in Bath, record ID BB2/B62C/272 applies to the names Brian Armstrong- CLIFFORD and Brian ARMSTRONG-CLIFFORD - an example of the first
+				  # e.g. in Bath, record ID BC1/C60C/104 applies to the names John ALEXANDER and Jack ALEXANDER - an example of the second
+				  # e.g. in Bath, record IDs BB2/B58C/164 and BB2/B59C/207 apply to the names Katherine Helen ANGUS and Kit ANGUS, and to Henry Frederick John ANDREWS and Harry ANDREWS, respectively - both examples of the third (and the second)
+				  # only manual inspection can rescue records of the second and third category, but we can automate rescue of the first
+				  # the way we do this is to convert all possible names associated with a given reference into a gapless capitalised string, and then count the number of strings associated with that reference
+				  # if there is only one string (e.g. BRIANARMSTRONG-CLIFFORD), then what this means is that irrespective of the number of records associated with that reference ID, the names are the same
+				  # in that case, we increment $override and allow one of the records to be processed - they are chosen "randomly", as the first one seen by Perl's sorting function
+				  my @line = split(/\,/,$excl);
+				  my $surname = $line[1]; my $forenames = $line[2]; my $age = $line[3]; my $death_year = $line[5]; my $subdistrict = $line[6];
+				  my $details = "$forenames"."$surname"."$age"."$death_year"."$subdistrict";
+				  $details =~ s/\x00//; $details =~ s/\"//g; $details =~ s/\-//g; $details =~ s/\s+//g; $details = uc($details);
+				  $details_for_this_ref{$details}++;
+				}
+			  my $details_for_this_ref = scalar keys %details_for_this_ref;
+			  if ($details_for_this_ref == 1)
+				{ #print "one of these records is allowed\n";
+				  $override_allowed{$region}{$reference}++;
+				}
+			}
+		}
 	  
 	  # to see how many records share the same reference number, dump this hash
 #	  use Data::Dumper;
@@ -151,6 +235,7 @@ foreach my $region (@sorted_regions)
 #	  print DUMP Dumper (\%ref_nums);
 #	  close(DUMP) or die $!;
 		
+	  my %ref_nums_overridden = ();
 	  foreach my $year (@years)
 		{ next if (($year eq '.') or ($year eq '..'));
 		  opendir(DIR,"$in_dir/$region/$year") or die $!;
@@ -171,15 +256,14 @@ foreach my $region (@sorted_regions)
 				  if ($death_year =~ /^.+\/(\d+)$/) { $death_year  = $1; } # in Cheshire, the full date of death can be given instead of just the year, i.e. this variable takes the form "02/Aug/1906"; we wish to remove the day and month
 				  if ($subdistrict =~ /^\s+(.*?)$/) { $subdistrict = $1; }
 				  
+				  # CHECKPOINT: exclude multiple copies of the same record, but only for certain regions where there is a one-to-one correspondence between record and reference number *and* we have only overridden this requirement, if permitted, once (see above for details)
 				  my $num_records = scalar keys %{$ref_nums{$region}{$reference}};
-				  
-				  # CHECKPOINT: exclude multiple copies of the same record, but only for certain regions where there is a one-to-one correspondence between record and reference number (see above)
-#				  if ( ($num_records != 1) and (($region eq 'Bath') or ($region eq 'Cumbria') or ($region eq 'Shropshire') or ($region eq 'West_Midlands') or ($region eq 'Wiltshire') or ($region eq 'Yorkshire')) )
-#					{ while((my $excl,my $irrel)=each(%{$ref_nums{$region}{$reference}}))
-#						{ print "$reference has $num_records records --> $excl\n";
-#						}
-#					}
-				  next if ( ($num_records != 1) and (($region eq 'Bath') or ($region eq 'Cumbria') or ($region eq 'Shropshire') or ($region eq 'West_Midlands') or ($region eq 'Wiltshire') or ($region eq 'Yorkshire')) );
+				  my $override_allowed = 0;
+				  if (exists($override_allowed{$region}{$reference})) { $override_allowed = $override_allowed{$region}{$reference}; }
+				  my $overridden_already = 0;
+				  if (exists($ref_nums_overridden{$region}{$reference})) { $overridden_already = $ref_nums_overridden{$region}{$reference}; }
+				  next if ( ($num_records != 1) and ($overridden_already > 0) and (($region eq 'Bath') or ($region eq 'Cumbria') or ($region eq 'Shropshire') or ($region eq 'West_Midlands') or ($region eq 'Wiltshire') or ($region eq 'Yorkshire')) );
+				  if ($override_allowed > 0) { $ref_nums_overridden{$region}{$reference}++; }
 				  
 				  next if ($death_year !~ /^\d{4}$/); # CHECKPOINT: year of death has to be a recognisable 4 digit number. If it isn't, it's more likely that age and year have been swapped around by mistake
 				  my $year;
@@ -211,29 +295,91 @@ foreach my $region (@sorted_regions)
 						}
 					  next if (($forenames =~ /Countess Of/) or ($forenames =~ /Prince Of/) or ($forenames =~ /Late Of/));
 					  
-					  # note that when determining which are the first and middle names that there are occasional records where the middle name is "Van De/Der/Den" - this is a common Dutch prefix and should actually be part of the surname
+					  # note that when determining which are the first and middle names that there are some exceptional cases which should be accounted for, including joint first names and Dutch surname prefixes
 					  my $first_name; my $middle_names;
 					  if ($forenames =~ /^(.*?) (.*?)$/)
 						{ $first_name = $1; $middle_names = $2;
-						  if (($middle_names =~ /^Van De$/) or ($middle_names =~ /^Van Der$/) or ($middle_names =~ /^Van Den$/)) # if there are only two "middle names", "Van" and "De/Der/Den", then prefix the latter to the surname and empty the variable $middle_name
-							{ $surname = "$middle_names $surname"; $surname = uc($surname);
-							  $forenames = $first_name;
+						  
+						  # if the first name ends in a hyphen and there is only one middle name (e.g. "Ann- Marie"), append the latter to the former - unless the middle name is an initial (because there is not enough information to go on)
+						  if (($first_name =~ /-$/) and ($middle_names !~ /\s/))
+							{ my $length_of_middle_name = length($middle_names);
+							  next if ($length_of_middle_name == 1);
+							  my $new_first_name = "$first_name"."$middle_names";
+							  print "edited $first_name $middle_names $surname to $new_first_name $surname\n";
+							  $first_name = $new_first_name;
 							  $middle_names = '';
+							  $forenames = $first_name;
+							}
+						  
+						  # if there is one "middle name" and that name is a hyphen, then it is treated as a placeholder character meaning "not applicable", and so removed
+						  if (($first_name !~ /\-$/) and ($middle_names =~ /^-$/))
+							{ my $new_first_name = $first_name;
+							  print "edited $first_name $middle_names $surname to $new_first_name $surname\n";
+							  $first_name = $new_first_name;
+							  $middle_names = '';
+							  $forenames = $first_name;
+							}
+							
+						  # if there are only two "middle names", "Van" and "De/Der/Den", then prefix the latter to the surname and empty the variable $middle_name
+						  if (($middle_names =~ /^Van De$/) or ($middle_names =~ /^Van Der$/) or ($middle_names =~ /^Van Den$/))
+							{ my $new_surname = "$middle_names $surname"; $new_surname = uc($new_surname);
+							  print "edited $first_name $middle_names $surname to $first_name $new_surname...\n";
+							  $surname = $new_surname;
+							  $middle_names = '';
+							  $forenames = $first_name;
+							}
+						  
+						  # if the last two "middle names" are "Van" and "De/Der/Den", then prefix the latter to the surname and revise the variable $middle_name
+						  if (($middle_names =~ /^(.*?) (Van De)$/) or ($middle_names =~ /^(.*?) (Van Der)$/) or ($middle_names =~ /^(.*?) (Van Den)$/))
+							{ my $new_middle_names = $1;
+							  my $new_surname = "$2 $surname"; $new_surname = uc($new_surname);
+							  print "edited $first_name $middle_names $surname to $first_name $new_middle_names $new_surname...\n";
+							  $middle_names = $new_middle_names;
+							  $surname = $new_surname;
+							  $forenames = "$first_name $middle_names";
+							}
+						  
+						  # if the middle name contains multiple hyphens, e.g. E-----, then remove all of them and leave only the initial
+						  if ($middle_names =~ /^(\w{1})\-+$/)
+							{ my $new_middle_names = $1;
+							  print "edited $first_name $middle_names $surname to $first_name $new_middle_names $surname\n";
+							  $middle_names = $new_middle_names;
+							  $forenames = "$first_name $middle_names";
+							}
+						  
+						  # if there is one middle name and it ends in a hyphen, then we assume it is part of a compound surname - unless that middle name is an initial (because there is not enough information to go on) or the surname is already hyphenated
+						  if (($middle_names =~ /^(\w+)\-$/) and ($surname !~ /\-/))
+							{ my $length_of_middle_name = length($1);
+							  next if ($length_of_middle_name == 1);
+							  my $new_surname = "$1-$surname"; $new_surname = uc($new_surname);
+							  print "edited $first_name $middle_names $surname to $first_name $new_surname...\n";
+							  $middle_names = '';
+							  $surname = $new_surname;
+							  $forenames = $first_name;
+							}
+						  
+						  # if there are multiple middle names, the last of which ends in a hyphen, then we assume it is part of a compound surname - unless either middle name is an initial (because there is not enough information to go on) or the surname is already hyphenated
+						  if (($middle_names =~ /^(\w+) (\w+)\-$/) and ($surname !~ /\-/))
+							{ my $length_of_middle_name1 = length($1); my $length_of_middle_name2 = length($2);
+							  next if (($length_of_middle_name1 == 1) or ($length_of_middle_name2 == 1));
+							  my $new_middle_names = $1;
+							  my $new_surname = "$2-$surname"; $new_surname = uc($new_surname);
+							  print "edited $first_name $middle_names $surname to $first_name $new_middle_names $new_surname...\n";
+							  $middle_names = $new_middle_names;
+							  $surname = $new_surname;
+							  $forenames = "$first_name $middle_names";
 							}
 						}
 					  else
 						{ $first_name = $forenames; }
 					  
+					  if (exists($edits{$first_name})) { $first_name = $edits{$first_name}; } # where appropriate, correct first names on the basis of a manually generated lookup table
 					  next if (!(defined($first_name)));
 #					  next if ($first_name =~ /^\w{1}$/); # CHECKPOINT: this is not a name but an initial
-#					  next if (($first_name =~ /^\-/) or ($first_name =~ /\-$/)); # CHECKPOINT: records that begin or end with a hyphen are likely to be compound first names (such as Anna-Marie) with an erroneous space between them
 					  next if ($first_name !~ /[a-z]/i); # CHECKPOINT: name does not contain at least one alphabetical character
 					  next if ($first_name =~ /^\s+$/);
 					  next if ($first_name eq '');
 					
-					  $full_names{"$forenames $surname"}{$year}++;
-					  $surnames{$surname}++;
-					  $forenames{$first_name}++;
 					  my $first_name_gender = 'undetermined';
 					  my $first_name_uc = uc($first_name);
 					  if ((exists($genders{$first_name_uc})) and ($first_name_uc !~ /^\w{1}$/)) { $first_name_gender = $genders{$first_name_uc}; }
@@ -251,7 +397,8 @@ foreach my $region (@sorted_regions)
 						  my $number_of_middle_names_for_this_record = 0;
 						  my @middle_names = split(/ /,$middle_names);
 						  foreach my $middle_name (@middle_names)
-							{ next if ($middle_name =~ /\d+/); # CHECKPOINT: this is not a name but a number
+							{ if (exists($edits{$middle_name})) { $middle_name = $edits{$middle_name}; } # where appropriate, correct middle names on the basis of a manually generated lookup table
+							  next if ($middle_name =~ /\d+/); # CHECKPOINT: this is not a name but a number
 							  #next if ($middle_name =~ /^\w{1}$/); # CHECKPOINT: this is not a name but an initial
 							  next if (($middle_name =~ /\(/) or ($middle_name =~ /\[/) or ($middle_name =~ /\)/) or ($middle_name =~ /\]/)); # CHECKPOINT: records in brackets, e.g. "(boy)", are either not bona fide names or reflect lack of confidence in the transcription, e.g. "(kenneth)"
 #							  next if (($middle_name =~ /^\-/) or ($middle_name =~ /\-$/)); # CHECKPOINT: records that begin or end with a hyphen are likely to be compound first names (such as Anna-Marie), mistranscribed by being split into 'first name' and 'middle name' categories. In the case of middle names, records that end with a hyphen are usually the start of a double-barrelled surname, the first part of which is recorded in the 'middle name' box
@@ -282,11 +429,17 @@ foreach my $region (@sorted_regions)
 							}
 						  if ($number_of_middle_names_for_this_record >= 1)
 							{ push(@{$average_number_of_middle_names_per_record{$year}},$number_of_middle_names_for_this_record); }
+						  $forenames = "$first_name $acceptable_middle_name_records";
 						}
 					  else
 						{ $middle_names_data{$year}{'(none)'}++;
 						  $middle_names{'(none)'}++;
+						  $forenames = $first_name;
 						}
+					  
+					  $full_names{"$forenames $surname"}{$year}++;
+					  $surnames{$surname}++;
+					  $forenames{$first_name}++;
 					}
 				}
 			  close(IN) or die $!;
@@ -359,7 +512,7 @@ for(my $x=0;$x<=1;$x++)
 	  my @names = ();
 	  while((my $name,my $irrel)=each(%names))
 		{ push(@names,$name); }
-	  my @sorted_names = sort {$a cmp $b} @names;
+	  my @sorted_names = sort {"\L$a" cmp "\L$b"} @names;
 	  my @all_name_usage = (); my @all_name_usage_F = (); my @all_name_usage_M = ();
 	  foreach my $name (@sorted_names)
 		{ print "parsing $data_type, first round: $name...\n";
@@ -698,7 +851,7 @@ close(SUMMARY_PER_YEAR) or die $!;
 my @first_names = ();
 while((my $first_name,my $irrel)=each(%forenames))
 	{ push(@first_names,$first_name); }
-my @sorted_first_names = sort {$a cmp $b} @first_names;
+my @sorted_first_names = sort {"\L$a" cmp "\L$b"} @first_names;
 my $abs_total = 0;
 foreach my $first_name (@sorted_first_names)
 	{ my $total = $forenames{$first_name};
@@ -718,7 +871,7 @@ close(OUT_ALL_FIRST) or die $!;
 my @middle_names = ();
 while((my $middle_name,my $irrel)=each(%middle_names))
 	{ push(@middle_names,$middle_name); }
-my @sorted_middle_names = sort {$a cmp $b} @middle_names;
+my @sorted_middle_names = sort {"\L$a" cmp "\L$b"} @middle_names;
 $abs_total = 0;
 foreach my $middle_name (@sorted_middle_names)
 	{ my $total = $middle_names{$middle_name};
@@ -738,7 +891,7 @@ close(OUT_ALL_MIDDLE) or die $!;
 my @first_and_middle_names = ();
 while((my $first_and_middle_name,my $irrel)=each(%first_and_middle_names))
 	{ push(@first_and_middle_names,$first_and_middle_name); }
-my @sorted_first_and_middle_names = sort {$a cmp $b} @first_and_middle_names;
+my @sorted_first_and_middle_names = sort {"\L$a" cmp "\L$b"} @first_and_middle_names;
 $abs_total = 0;
 foreach my $first_and_middle_name (@sorted_first_and_middle_names)
 	{ my $total = $first_and_middle_names{$first_and_middle_name};
@@ -774,7 +927,7 @@ close(OUT_ALL_FIRST_MIDL) or die $!;
 my @full_names = ();
 while((my $full_name,my $irrel)=each(%full_names))
 	{ push(@full_names,$full_name); }
-my @sorted_full_names = sort {$a cmp $b} @full_names;
+my @sorted_full_names = sort {"\L$a" cmp "\L$b"} @full_names;
 foreach my $full_name (@sorted_full_names)
 	{ my @years = ();
 	  while((my $year,my $irrel)=each(%{$full_names{$full_name}}))
@@ -858,12 +1011,18 @@ foreach my $num_of_times_used_as_forename (@sorted_numbers)
 		{ my $gender = 'undetermined';
 		  my $name_uc = uc($name);
 		  if ((exists($genders{$name_uc})) and ($name_uc !~ /^\w{1}$/)) { $gender = $genders{$name_uc}; }
+		  my $num_of_times_used_as_forename	   = $number_of_times_used{$name}{forename};
 		  my $num_of_times_used_as_middle_name = $number_of_times_used{$name}{middle_name};
+		  my $num_of_times_used_as_surname 	   = $number_of_times_used{$name}{surname};
+		  my $total_num_of_times_used_as_a_name_in_any_position = $num_of_times_used_as_forename+$num_of_times_used_as_middle_name+$num_of_times_used_as_surname;
+		  my $pct_of_times_used_as_forename    = sprintf("%.2f",(($num_of_times_used_as_forename/$total_num_of_times_used_as_a_name_in_any_position)*100));
+		  my $pct_of_times_used_as_middle_name = sprintf("%.2f",(($num_of_times_used_as_middle_name/$total_num_of_times_used_as_a_name_in_any_position)*100));
+		  my $pct_of_times_used_as_surname     = sprintf("%.2f",(($num_of_times_used_as_surname/$total_num_of_times_used_as_a_name_in_any_position)*100));
 		  if ($num_of_names == 1)
 			{ my $num_of_times_used_as_surname = $number_of_times_used{$name}{surname};
 			  my $ratio_of_surname_to_forename_use = 'NA';
 			  if ($num_of_times_used_as_forename > 0) { $ratio_of_surname_to_forename_use = sprintf("%.3f",($num_of_times_used_as_surname/$num_of_times_used_as_forename)); }
-			  my $out_line = "$name\t$gender\t$num_of_times_used_as_forename\t$num_of_times_used_as_middle_name\t$num_of_times_used_as_surname\t$ratio_of_surname_to_forename_use";
+			  my $out_line = "$name\t$gender\t$num_of_times_used_as_forename\t$num_of_times_used_as_middle_name\t$num_of_times_used_as_surname\t$total_num_of_times_used_as_a_name_in_any_position\t$pct_of_times_used_as_forename\t$pct_of_times_used_as_middle_name\t$pct_of_times_used_as_surname\t$ratio_of_surname_to_forename_use";
 			  push(@{$print_order{$num_of_times_used_as_middle_name}{$num_of_times_used_as_surname}},$out_line);
 			}
 		  else
@@ -881,12 +1040,17 @@ foreach my $num_of_times_used_as_forename (@sorted_numbers)
 			  my $gender = 'undetermined';
 			  my $name_uc = uc($name);
 			  if ((exists($genders{$name_uc})) and ($name_uc !~ /^\w{1}$/)) { $gender = $genders{$name_uc}; }
-			  my $num_of_times_used_as_surname = $number_of_times_used{$name}{surname};
+			  my $num_of_times_used_as_forename	   = $number_of_times_used{$name}{forename};
+			  my $num_of_times_used_as_surname 	   = $number_of_times_used{$name}{surname};
+			  my $total_num_of_times_used_as_a_name_in_any_position = $num_of_times_used_as_forename+$num_of_times_used_as_middle_name+$num_of_times_used_as_surname;
+			  my $pct_of_times_used_as_forename    = sprintf("%.2f",(($num_of_times_used_as_forename/$total_num_of_times_used_as_a_name_in_any_position)*100));
+			  my $pct_of_times_used_as_middle_name = sprintf("%.2f",(($num_of_times_used_as_middle_name/$total_num_of_times_used_as_a_name_in_any_position)*100));
+			  my $pct_of_times_used_as_surname     = sprintf("%.2f",(($num_of_times_used_as_surname/$total_num_of_times_used_as_a_name_in_any_position)*100));
 			  my $num_of_names = scalar keys %{$usage_as_a_middle_name{$num_of_times_used_as_forename}{$num_of_times_used_as_middle_name}};
 			  if ($num_of_names == 1)
 				{ my $ratio_of_surname_to_forename_use = 'NA';
 				  if ($num_of_times_used_as_forename > 0) { $ratio_of_surname_to_forename_use = sprintf("%.3f",($num_of_times_used_as_surname/$num_of_times_used_as_forename)); }
-				  my $out_line = "$name\t$gender\t$num_of_times_used_as_forename\t$num_of_times_used_as_middle_name\t$num_of_times_used_as_surname\t$ratio_of_surname_to_forename_use";
+				  my $out_line = "$name\t$gender\t$num_of_times_used_as_forename\t$num_of_times_used_as_middle_name\t$num_of_times_used_as_surname\t$total_num_of_times_used_as_a_name_in_any_position\t$pct_of_times_used_as_forename\t$pct_of_times_used_as_middle_name\t$pct_of_times_used_as_surname\t$ratio_of_surname_to_forename_use";
 				  push(@{$print_order{$num_of_times_used_as_middle_name}{$num_of_times_used_as_surname}},$out_line);
 				}
 			  else
@@ -905,12 +1069,17 @@ foreach my $num_of_times_used_as_forename (@sorted_numbers)
 			  my $gender = 'undetermined';
 			  my $name_uc = uc($name);
 			  if ((exists($genders{$name_uc})) and ($name_uc !~ /^\w{1}$/)) { $gender = $genders{$name_uc}; }
+			  my $num_of_times_used_as_forename	   = $number_of_times_used{$name}{forename};
 			  my $num_of_times_used_as_middle_name = $number_of_times_used{$name}{middle_name};
+			  my $total_num_of_times_used_as_a_name_in_any_position = $num_of_times_used_as_forename+$num_of_times_used_as_middle_name+$num_of_times_used_as_surname;
+			  my $pct_of_times_used_as_forename    = sprintf("%.2f",(($num_of_times_used_as_forename/$total_num_of_times_used_as_a_name_in_any_position)*100));
+			  my $pct_of_times_used_as_middle_name = sprintf("%.2f",(($num_of_times_used_as_middle_name/$total_num_of_times_used_as_a_name_in_any_position)*100));
+			  my $pct_of_times_used_as_surname     = sprintf("%.2f",(($num_of_times_used_as_surname/$total_num_of_times_used_as_a_name_in_any_position)*100));
 			  my $num_of_names = scalar keys %{$usage_as_a_surname{$num_of_times_used_as_forename}{$num_of_times_used_as_surname}};
 			  if ($num_of_names == 1)
 				{ my $ratio_of_surname_to_forename_use = 'NA';
 				  if ($num_of_times_used_as_forename > 0) { $ratio_of_surname_to_forename_use = sprintf("%.3f",($num_of_times_used_as_surname/$num_of_times_used_as_forename)); }
-				  my $out_line = "$name\t$gender\t$num_of_times_used_as_forename\t$num_of_times_used_as_middle_name\t$num_of_times_used_as_surname\t$ratio_of_surname_to_forename_use";
+				  my $out_line = "$name\t$gender\t$num_of_times_used_as_forename\t$num_of_times_used_as_middle_name\t$num_of_times_used_as_surname\t$total_num_of_times_used_as_a_name_in_any_position\t$pct_of_times_used_as_forename\t$pct_of_times_used_as_middle_name\t$pct_of_times_used_as_surname\t$ratio_of_surname_to_forename_use";
 				  push(@{$print_order{$num_of_times_used_as_middle_name}{$num_of_times_used_as_surname}},$out_line);
 				}
 			  else
@@ -928,9 +1097,13 @@ foreach my $num_of_times_used_as_forename (@sorted_numbers)
 			  my $num_of_times_used_as_forename	   = $number_of_times_used{$name}{forename};
 			  my $num_of_times_used_as_middle_name = $number_of_times_used{$name}{middle_name};
 			  my $num_of_times_used_as_surname 	   = $number_of_times_used{$name}{surname};
+			  my $total_num_of_times_used_as_a_name_in_any_position = $num_of_times_used_as_forename+$num_of_times_used_as_middle_name+$num_of_times_used_as_surname;
+			  my $pct_of_times_used_as_forename    = sprintf("%.2f",(($num_of_times_used_as_forename/$total_num_of_times_used_as_a_name_in_any_position)*100));
+			  my $pct_of_times_used_as_middle_name = sprintf("%.2f",(($num_of_times_used_as_middle_name/$total_num_of_times_used_as_a_name_in_any_position)*100));
+			  my $pct_of_times_used_as_surname     = sprintf("%.2f",(($num_of_times_used_as_surname/$total_num_of_times_used_as_a_name_in_any_position)*100));
 			  my $ratio_of_surname_to_forename_use = 'NA';
 			  if ($num_of_times_used_as_forename > 0) { $ratio_of_surname_to_forename_use = sprintf("%.3f",($num_of_times_used_as_surname/$num_of_times_used_as_forename)); }
-			  my $out_line = "$name\t$gender\t$num_of_times_used_as_forename\t$num_of_times_used_as_middle_name\t$num_of_times_used_as_surname\t$ratio_of_surname_to_forename_use";
+			  my $out_line = "$name\t$gender\t$num_of_times_used_as_forename\t$num_of_times_used_as_middle_name\t$num_of_times_used_as_surname\t$total_num_of_times_used_as_a_name_in_any_position\t$pct_of_times_used_as_forename\t$pct_of_times_used_as_middle_name\t$pct_of_times_used_as_surname\t$ratio_of_surname_to_forename_use";
 			  push(@{$print_order{$num_of_times_used_as_middle_name}{$num_of_times_used_as_surname}},$out_line);
 			}
 		}
