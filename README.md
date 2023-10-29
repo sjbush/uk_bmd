@@ -1,7 +1,7 @@
 # uk_bmd
 This repository contains the datasets described in the paper "The UK Local BMD: A Full Name Onomastic Resource", alongside the scripts necessary to generate them.
 
-The raw data (not included in this repo) are sourced from the [UK Local BMD](https://www.ukbmd.org.uk/localbmdproject), a volunteer project to transcribe the birth, marriage and death records of England and Wales (more specifically, from the 12 cities, counties and regions of [Bath](http://www.bathbmd.org.uk/), [Berkshire](https://www.berkshirebmd.org.uk/), [Cheshire](http://www.cheshirebmd.org.uk/), [Cumbria](http://www.cumbriabmd.org.uk/), [Kingston-upon-Thames](https://kingstonbmd.org.uk/), [Lancashire](http://www.lancashirebmd.org.uk/), [North Wales](http://www.northwalesbmd.org.uk/), [Shropshire](http://www.shropshirebmd.info/), [Staffordshire](https://www.staffordshirebmd.org.uk/), [West Midlands](https://www.westmidlandsbmd.org.uk/), [Wiltshire](http://www.wiltshirebmd.org.uk/), and [Yorkshire](http://www.yorkshirebmd.org.uk/)), and processed to generate a rare onomastic resource - one which contains unredacted full names.
+The raw data (not included in this repo but available on request) are sourced from the [UK Local BMD](https://www.ukbmd.org.uk/localbmdproject), a volunteer project to transcribe the birth, marriage and death records of England and Wales (more specifically, from the 12 cities, counties and regions of [Bath](http://www.bathbmd.org.uk/), [Berkshire](https://www.berkshirebmd.org.uk/), [Cheshire](http://www.cheshirebmd.org.uk/), [Cumbria](http://www.cumbriabmd.org.uk/), [Kingston-upon-Thames](https://kingstonbmd.org.uk/), [Lancashire](http://www.lancashirebmd.org.uk/), [North Wales](http://www.northwalesbmd.org.uk/), [Shropshire](http://www.shropshirebmd.info/), [Staffordshire](https://www.staffordshirebmd.org.uk/), [West Midlands](https://www.westmidlandsbmd.org.uk/), [Wiltshire](http://www.wiltshirebmd.org.uk/), and [Yorkshire](http://www.yorkshirebmd.org.uk/)), and processed to generate a rare onomastic resource - one which contains unredacted full names.
 
 The two subdirectories in this repo, 'dataset_B' and 'dataset_D', represent data processed from 25,213,860 birth and 9,887,244 death records, respectively, with the contents of each file described in the paper. These include the total count of each name registered per year. Birth records span the period 1837 - 2022 and death records 1733 - 2009, in both cases representing an assumed unbiased population sample.
 
@@ -143,7 +143,7 @@ Figure 4: 3b.parse_death_records.pl
 
 # Date the raw records were last downloaded
 
-Both the dataset_B and dataset_D archives - which contain the output of scripts 3a and 3b - use data last obtained in September 2023. Note that this is the date of last access - not the same as the date these records were last updated.
+Data in both the dataset_B and dataset_D subdirectories - which contain the output of scripts 3a and 3b - were generated using birth/death records last obtained in September 2023. Note that this is the date of last access - not the same as the date these records were last updated.
 
 _Birth records:_
 
