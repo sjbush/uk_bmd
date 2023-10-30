@@ -1,0 +1,8 @@
+59f50bc4b2d01f347ce99717f79f363a  all_first_and_middle_names.txt.tar.gz
+ac17e244fb98727743594c9830740cc4  all_first_names.txt.tar.gz
+210e211641d07a5be2771fee64391b6d  all_full_names.txt.tar.gz
+f338efee52bab29240c5246f449cbef5  all_middle_names.txt.tar.gz
+e419656ee55cf7b91ee0bdb9928b1ac6  first_name_as_absolute_number_of_records_per_year.txt.tar.gz
+6860fb70dc3ef5503d5d795eedae474a  first_name_as_percentage_of_records_per_year.txt.tar.gz
+47a24f51c5c310720ca11c0bf1234efa  middle_name_as_absolute_number_of_records_per_year.txt.tar.gz
+306296a7c7862ddb69487ff54ca6a84e  middle_name_as_percentage_of_records_per_year.txt.tar.gz
