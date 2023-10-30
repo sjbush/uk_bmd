@@ -35,7 +35,7 @@ Records were excluded if the 'forename(s)' field:
 	* this invariably matches a descriptive phrase instead of a name, such as in birth records beginning _Child of_, _Son of_ or _Daughter of_, and in death records beginning _Late of_
 * for some regions (Bath, Cumbria, Shropshire, West Midlands, Wiltshire, Yorkshire), records had a unique reference number but for others (Berkshire, Cheshire, Kingston, Lancashire, North Wales, Staffordshire) multiple different records could share the same reference. In this case, the reference number refers to a processing batch, often (but not always) of around five records at a time.
 	* for those regions where there is meant to be a one-to-one correspondence between record and reference number, what do we do when more than one record has that number?
-	* we could exclude them as a matter of course, but on manual inspection we find there is a good reason why this has happened
+	* we could exclude them as a matter of course, but on manual inspection we may find there is a good reason why this has happened
 	* it is either because the name is complex and there is ambiguity in the "forenames" and "surname" fields, *or* because the record did not include all names *or* (in the case of death records) because the record included prefered names as opposed to the literal birth name
 	* e.g. _Brian Armstrong- CLIFFORD_ and _Brian ARMSTRONG-CLIFFORD_ - an example of the first
 	* _John ALEXANDER_ and _Jack ALEXANDER_ - an example of the second
