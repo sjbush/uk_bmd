@@ -39,14 +39,15 @@ my $out_per_year		= "$out_dir/summary_of_records_per_year.txt";
 my $out_all_first		= "$out_dir/all_first_names.txt";
 my $out_all_middle		= "$out_dir/all_middle_names.txt";
 my $out_all_first_midl  = "$out_dir/all_first_and_middle_names.txt";
-my $out_all_full 		= "$out_dir/all_full_names.txt";
+my $out_all_full_dir 	= "$out_dir/all_full_names";
 my $out_pct_first	 	= "$out_dir/first_name_as_percentage_of_records_per_year.txt";
 my $out_abs_first	    = "$out_dir/first_name_as_absolute_number_of_records_per_year.txt";
 my $out_pct_middle	    = "$out_dir/middle_name_as_percentage_of_records_per_year.txt";
 my $out_abs_middle		= "$out_dir/middle_name_as_absolute_number_of_records_per_year.txt";
 my $out_total_name_freq = "$out_dir/name_frequencies_summed_across_all_years.txt";
+if (!(-d($out_all_full_dir))) { mkdir $out_all_full_dir or die $!; }
 open(SUMMARY,'>',$out_summary) or die $!; open(SUMMARY_PER_YEAR,'>',$out_per_year) or die $!;
-open(OUT_ALL_FIRST,'>',$out_all_first) or die $!; open(OUT_ALL_MIDDLE,'>',$out_all_middle) or die $!; open(OUT_ALL_FIRST_MIDL,'>',$out_all_first_midl) or die $!; open(OUT_ALL_FULL,'>',$out_all_full) or die $!;
+open(OUT_ALL_FIRST,'>',$out_all_first) or die $!; open(OUT_ALL_MIDDLE,'>',$out_all_middle) or die $!; open(OUT_ALL_FIRST_MIDL,'>',$out_all_first_midl) or die $!;
 open(OUT_TOTAL_NAME_FREQ,'>',$out_total_name_freq) or die $!;
 open(OUT_PCT_FIRST,'>',$out_pct_first) or die $!; open(OUT_ABS_FIRST,'>',$out_abs_first) or die $!;
 open(OUT_PCT_MIDDLE,'>',$out_pct_middle) or die $!; open(OUT_ABS_MIDDLE,'>',$out_abs_middle) or die $!;
@@ -58,7 +59,6 @@ print SUMMARY 		   	  "Region\tURL\tDate that the local BMD records obtained for
 print OUT_ALL_FIRST    	  "First name\tGender\tTotal no. of records with this first name\t% of total\n";
 print OUT_ALL_MIDDLE   	  "Middle name\tGender\tTotal no. of records with this middle name\t% of total\n";
 print OUT_ALL_FIRST_MIDL  "First name and middle name(s)\tNo. of middle names\tTotal no. of records with this first and middle name(s)\t% of total\tGender of first name\tGender of middle name(s)\n";
-print OUT_ALL_FULL 		  "Full name\tYear\tTotal no. of records with this full name in this year\n";
 print OUT_TOTAL_NAME_FREQ "Name\tGender\tNo. of occurrences as a forename\tNo. of occurrences as a middle name\tNo. of occurrences as a surname\tTotal no. of occurrences (in any position)\t% of occurrences as a forename\t% of occurrences as a middle name\t% of occurrences as a surname\tRatio of number of times this occurs as a surname to the number of times this occurs as a forename\tNo. of years in which this is used either as a forename or middle name\tYears in which this is used either as a forename or middle name\n";
 
 # STORE THE GENDER ASSOCIATED WITH EACH NAME
@@ -117,7 +117,6 @@ closedir(DIR) or die $!;
 my @sorted_regions = sort {$a cmp $b} @regions;
 foreach my $region (@sorted_regions)
 	{ next if (($region eq '.') or ($region eq '..'));
-	  #next if ($region ne 'Bath');
 	  print "births: $region...\n";
 	  my $url; my $date_of_last_update; # this is the date of the last update of the BIRTH records, specifically
 	  if    ($region eq 'Bath') 	  	 { $url = 'www.bathbmd.org.uk'; 	     $date_of_last_update = '23rd February 2008';  }
@@ -392,7 +391,7 @@ foreach my $region (@sorted_regions)
 						  $forenames = $first_name;
 						}
 					  
-					  $full_names{"$forenames $surname"}{$year}++;
+					  $full_names{$region}{"$forenames $surname"}{$year}++;
 					  $surnames{$surname}++;
 					  $forenames{$first_name}++;
 					}
@@ -877,22 +876,29 @@ foreach my $first_and_middle_name (@sorted_first_and_middle_names)
 	}
 close(OUT_ALL_FIRST_MIDL) or die $!;
 
-# PRINT THE FULL LIST OF NAMES, AND ASSOCIATED ABSOLUTE COUNT PER YEAR
-my @full_names = ();
-while((my $full_name,my $irrel)=each(%full_names))
-	{ push(@full_names,$full_name); }
-my @sorted_full_names = sort {"\L$a" cmp "\L$b"} @full_names;
-foreach my $full_name (@sorted_full_names)
-	{ my @years = ();
-	  while((my $year,my $irrel)=each(%{$full_names{$full_name}}))
-		{ push(@years,$year); }
-	  my @sorted_years = sort {$a <=> $b} @years;
-	  foreach my $year (@sorted_years)
-		{ my $num = $full_names{$full_name}{$year};
-		  print OUT_ALL_FULL "$full_name\t$year\t$num\n";
+# FOR EACH REGION, PRINT THE FULL LIST OF NAMES, AND ASSOCIATED ABSOLUTE COUNT PER YEAR
+while((my $region,my $irrel)=each(%full_names))
+	{ open(OUT_ALL_FULL,'>',"$out_all_full_dir/$region.txt") or die $!;
+	  print OUT_ALL_FULL "Full name\tYear (total no. of records with this full name)\n";
+	  my @full_names = ();
+	  while((my $full_name,my $irrel)=each(%{$full_names{$region}}))
+		{ push(@full_names,$full_name); }
+	  my @sorted_full_names = sort {"\L$a" cmp "\L$b"} @full_names;
+	  foreach my $full_name (@sorted_full_names)
+		{ my @years = ();
+		  while((my $year,my $irrel)=each(%{$full_names{$region}{$full_name}}))
+			{ push(@years,$year); }
+		  my @sorted_years = sort {$a <=> $b} @years;
+		  my $count_per_year = '';
+		  foreach my $year (@sorted_years)
+			{ my $num = $full_names{$region}{$full_name}{$year};
+			  $count_per_year .= "$year ($num), ";
+			}
+		  $count_per_year =~ s/\, $//;
+		  print OUT_ALL_FULL "$full_name\t$count_per_year\n";
 		}
+	  close(OUT_ALL_FULL) or die $!;
 	}
-close(OUT_ALL_FULL) or die $!;
 
 # OUTPUT A SUMMARY OF THE DATA BY REGION
 foreach my $region (@sorted_regions)
