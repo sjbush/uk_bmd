@@ -57,8 +57,8 @@ Records were edited according to the following criteria:
 * if the middle name contains multiple hyphens, e.g. _E-----_, then remove all of them and leave only the initial
 	* this is a sign that the transcription was incomplete
 * if either first or middle name was a conventional abbreviation, it was expanded, and if an obvious typo, amended (noting the subjective nature of this edit)
-	* these are: _Wm_ to _William_, _Edwd_ to _Edward_, _Geo_ to _George_
-	* for a full list, see the two-column file "names_to_revise.txt"; the leftmost column is a name as it appears in the BMD, the rightmost how it is amended
+	* for example, _Wm_ to _William_, _Edwd_ to _Edward_, _Geo_ to _George_
+	* for the full list, see the two-column file "names_to_revise.txt"; the leftmost column is a name as it appears in the BMD, the rightmost how it is amended
 * if the forenames field had multiple middle names, the last of which ended in a hyphen, then we assume that is the first part of a compound surname - unless either middle name is an initial (because there is not enough information to go on) or the surname is already hyphenated
 	* e.g. _Ann Marie Hucklebury- FLYNN_ is edited to _Ann Marie HUCKLEBURY-FLYNN_
 	* note that there are many instances (mostly historical) where a familial surname has been used in a middle name position; we would assume _Ann Marie Hucklebury FLYNN_ (no hyphen) is one of them
