@@ -34,21 +34,23 @@ Records were excluded if the 'forename(s)' field:
 * contained the clause _" of "_ or _" Of "_, noting spaces between the word
 	* this invariably matches a descriptive phrase instead of a name, such as in birth records beginning _Child of_, _Son of_ or _Daughter of_, and in death records beginning _Late of_
 * for some regions (Bath, Cumbria, Shropshire, West Midlands, Wiltshire, Yorkshire), records had a unique reference number but for others (Berkshire, Cheshire, Kingston, Lancashire, North Wales, Staffordshire) multiple different records could share the same reference. In this case, the reference number refers to a processing batch, often (but not always) of around five records at a time.
-	* for those regions where there is meant to be a one-to-one correspondence between record and reference number, what do we do when more than one record has that number?
-	* we could exclude them as a matter of course, but on manual inspection we may find there is a good reason why this has happened
-	* it is either because the name is complex and there is ambiguity in the "forenames" and "surname" fields, *or* because the record did not include all names *or* (in the case of death records) because the record included prefered names as opposed to the literal birth name
-	* e.g. _Brian Armstrong- CLIFFORD_ and _Brian ARMSTRONG-CLIFFORD_ - an example of the first
-	* _John ALEXANDER_ and _Jack ALEXANDER_ - an example of the second
-	* _Katherine Helen ANGUS_ and _Kit ANGUS_, and _Henry Frederick John ANDREWS_ and _Harry ANDREWS_, respectively - both examples of the third (and the second)
-	* only manual inspection can rescue records of the second and third category, but we can automate rescue of the first
+	* for these 6 regions where there is meant to be a one-to-one correspondence between record and reference number, what do we do when more than one record has that number?
+	* we could either pick one at random and exclude the others, or exclude them all as a matter of course, but on manual inspection we may find there is a good reason why this has happened
+	* it is often either because the name is complex and there is ambiguity in the "forenames" and "surname" fields, *or* because the record either did not include all the names or (especially in the case of death records) because it used prefered names as opposed to the literal birth name
+	* e.g. category one (transcription error): _Brian Armstrong- CLIFFORD_ and _Brian ARMSTRONG-CLIFFORD_
+	* e.g. category two (same individual but different names): _John ALEXANDER_ and _Jack ALEXANDER_, _Katherine Helen ANGUS_ and _Kit ANGUS_, and _Henry Frederick John ANDREWS_ and _Harry ANDREWS_
+	* only manual inspection can rescue the "real" category two record (which we can't automate so must instead pick one at random), but we can automate rescue of the category one records
 	* the way we do this is to convert all possible names associated with a given reference into a gapless capitalised string, and then count the number of strings associated with that reference
 	* if there is only one string (e.g. _BRIANARMSTRONG-CLIFFORD_), then what this means is that irrespective of the number of records associated with that reference ID, the names are the same
 	* in that case, we allow one of these records to be processed, randomly chosen, and exclude the others
+ 	* for category two records, we just pick one at random. This is the preferable option because it means we aren't throwing out records arbitrarily - for instance, with _John/Jack ALEXANDER_, we know that there is an individual who goes by the name of either _John_ or _Jack_, so it is not inaccurate to include one of them in the output
+	* it's also important that we pick _one_ record rather than include _every_ record as there are some egregious examples of many records for the same name
+ 	* e.g. a birth record of _Edward C R F M ROSPIGLIOSI-PALLAVACINI_ with parallel records for _Edward C R F M ROSPIGLIOSI_ and _Edward C R F M PALLAVACINI_, and whose mother's maiden name (after a presumed remarriage) is either _Acton, Dalbert, Dalbert-Acton, Lyon, Lyon-Dalbert_ or _Lyonacton_. There are records containing combinations of all these names, all with the same reference number, making 17 records for the same boy. By picking one at random, we don't artificially inflate the number of births named _Edward_ by 16
 
 ## Criteria for editing
 
 Records were edited according to the following criteria:
-* if the forenames field began with either of the following - _Colonel, Corporal, Countness, Doctor, General, Lady, Lord, Major, Prince, Reverend, Sergeant_ - the text was removed
+* if the forenames field began with either of the following - _Colonel, Corporal, Countness, Doctor, General, H R H Prince, Lady, Lord, Major, Prince, Reverend, Sergeant, Sir, Sister_ - the text was removed
 	* this is a unique complication with death records: they sometimes contain titles which must first be omitted, otherwise they may mistakenly be interpreted as names
 * if the forenames field had one first name ending in a hyphen and only one middle name, then the latter is appended to the former - unless the middle name is an initial (because there is not enough information to go on)
 	* e.g. _Ann- Marie FLYNN_ is edited to _Ann-Marie FLYNN_
