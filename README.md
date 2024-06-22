@@ -1,5 +1,5 @@
 # uk_bmd
-This repository contains the datasets described in the paper "The UK Local BMD: A Full Name Onomastic Resource", alongside the scripts necessary to generate them.
+This repository contains the datasets described in the paper [The UK Local BMD: A Full Name Onomastic Resource](https://ans-names.pitt.edu/ans/article/view/2543), alongside the scripts necessary to generate them.
 
 The raw data (not included in this repo but available on request) are sourced from the [UK Local BMD](https://www.ukbmd.org.uk/localbmdproject), a volunteer project to transcribe the birth, marriage and death records of England and Wales (more specifically, from the 12 cities, counties and regions of [Bath](http://www.bathbmd.org.uk/), [Berkshire](https://www.berkshirebmd.org.uk/), [Cheshire](http://www.cheshirebmd.org.uk/), [Cumbria](http://www.cumbriabmd.org.uk/), [Kingston-upon-Thames](https://kingstonbmd.org.uk/), [Lancashire](http://www.lancashirebmd.org.uk/), [North Wales](http://www.northwalesbmd.org.uk/), [Shropshire](http://www.shropshirebmd.info/), [Staffordshire](https://www.staffordshirebmd.org.uk/), [West Midlands](https://www.westmidlandsbmd.org.uk/), [Wiltshire](http://www.wiltshirebmd.org.uk/), and [Yorkshire](http://www.yorkshirebmd.org.uk/)), and processed to generate a rare onomastic resource - one which contains unredacted full names.
 
