@@ -11,7 +11,7 @@ The two subdirectories in this repo, 'dataset_B' and 'dataset_D', represent data
 
 1. 22,637,285 birth records as of 12th September 2016; as used by [Bush, et al. 2018](https://doi.org/10.1371/journal.pone.0205759).
 2. 23,468,892 birth records as of 29th January 2018; as used by both [Bush 2019](https://doi.org/10.1080/00277738.2018.1536186) and [Bush 2020](https://doi.org/10.1080/00277738.2020.1775471), with the raw dataset hosted via the [University of Edinburgh DataShare portal](http://dx.doi.org/10.7488/ds/2294).
-3. 25,213,860 birth and 9,887,244 death records as of 13th September 2023; as used by [Bush 2024](https://doi.org/10.5195/names.2024.2543), with the raw datasets available in [this very repo](www.github.com/sjbush).
+3. 25,213,860 birth and 9,887,244 death records as of 13th September 2023; as used by [Bush 2024](https://doi.org/10.5195/names.2024.2543), with the raw datasets available in [this very repo](https://www.github.com/sjbush).
 4. 24,084,977 birth and 9,888,837 death records as of 13th January 2026; as used by [Bush 2026](https://doi.org/10.5195/names.2026.2884), with the raw datasets hosted via [FigShare](https://doi.org/10.6084/m9.figshare.31249012).
 
 Note that the number of birth records decreases between [Bush 2024](https://doi.org/10.5195/names.2024.2543) and [Bush 2026](https://doi.org/10.5195/names.2026.2884), albeit by <5% of the total. The reason for this was an error (now corrected) when parsing data from the six regions where there was meant to be a one-to-one correspondence between birth record and reference number, but where more than one record had that number.
