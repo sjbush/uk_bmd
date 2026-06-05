@@ -1,11 +1,18 @@
 # uk_bmd
-This repository contains the datasets described in the paper [The UK Local BMD: A Full Name Onomastic Resource](https://ans-names.pitt.edu/ans/article/view/2543), alongside the scripts necessary to generate them.
+This repository contains the datasets described in the Bush 2024 paper [The UK Local BMD: A Full Name Onomastic Resource](https://ans-names.pitt.edu/ans/article/view/2543), alongside the scripts necessary to generate them. Please see "important note 2", below, for links to updated versions of this dataset.
 
 The raw data (not included in this repo but available on request) are sourced from the [UK Local BMD](https://www.ukbmd.org.uk/localbmdproject), a volunteer project to transcribe the birth, marriage and death records of England and Wales (more specifically, from the 12 cities, counties and regions of [Bath](http://www.bathbmd.org.uk/), [Berkshire](https://www.berkshirebmd.org.uk/), [Cheshire](http://www.cheshirebmd.org.uk/), [Cumbria](http://www.cumbriabmd.org.uk/), [Kingston-upon-Thames](https://kingstonbmd.org.uk/), [Lancashire](http://www.lancashirebmd.org.uk/), [North Wales](http://www.northwalesbmd.org.uk/), [Shropshire](http://www.shropshirebmd.info/), [Staffordshire](https://www.staffordshirebmd.org.uk/), [West Midlands](https://www.westmidlandsbmd.org.uk/), [Wiltshire](http://www.wiltshirebmd.org.uk/), and [Yorkshire](http://www.yorkshirebmd.org.uk/)), and processed to generate a rare onomastic resource - one which contains unredacted full names.
 
 The two subdirectories in this repo, 'dataset_B' and 'dataset_D', represent data processed from 25,213,860 birth and 9,887,244 death records, respectively, with the contents of each file described in the paper. These include the total count of each name registered per year. Birth records span the period 1837 - 2022 and death records 1733 - 2009, in both cases representing an assumed unbiased population sample.
 
-**IMPORTANT**: the years shown in both datasets represent the known or imputed year of birth, and in this respect, the two datasets are directly comparable. To repeat: the years shown in the 'death' dataset do not represent the year of death; they represent the year of birth (i.e. year of death - age at death, unless otherwise specified). Unfortunately, age at death was not provided for records in Cumbria, Shropshire, the West Midlands and the vast majority of data from North Wales, and as such, no (or very few) death records could be used from those regions.
+**IMPORTANT NOTE 1**: the years shown in both datasets represent the known or imputed year of birth, and in this respect, the two datasets are directly comparable. To repeat: the years shown in the 'death' dataset do not represent the year of death; they represent the year of birth (i.e. year of death - age at death, unless otherwise specified). Unfortunately, age at death was not provided for records in Cumbria, Shropshire, the West Midlands and the vast majority of data from North Wales, and as such, no (or very few) death records could be used from those regions.
+
+**IMPORTANT NOTE 2**: as the UK BMD is an actively updated dataset, publications making use of it have used incrementally revised versions. This repo archives the data associated with [Bush 2024](https://doi.org/10.5195/names.2024.2543) but this is NOT the latest version of the dataset. Its update history, including a link to the latest version, is as follows:
+
+1. 22,637,285 birth records as of 12th September 2016; as used by [Bush, et al. 2018](https://doi.org/10.1371/journal.pone.0205759).
+2. 23,468,892 birth records as of 29th January 2018; as used by both [Bush 2019](https://doi.org/10.7488/ds/2294) and [Bush 2020](https://doi.org/10.1080/00277738.2020.1775471), with the raw dataset hosted via the [University of Edinburgh DataShare portal](http://dx.doi.org/10.7488/ds/2294).
+3. 25,213,860 birth and 9,887,244 death records as of 13th September 2023; as used by [Bush 2024](https://doi.org/10.5195/names.2024.2543), with the raw datasets available in [this very repo](www.github.com/sjbush).
+4. 24,084,977 birth and 9,888,837 death records as of 13th January 2026; as used by [Bush 2026](https://doi.org/10.5195/names.2026.2884), with the raw datasets hosted via [FigShare](https://doi.org/10.6084/m9.figshare.31249012).
 
 # A Note on the Name
 
@@ -145,7 +152,7 @@ Figure 4: 3b.parse_death_records.pl
 
 # Date the raw records were last downloaded
 
-Data in both the dataset_B and dataset_D subdirectories - which contain the output of scripts 3a and 3b - were generated using birth/death records last obtained in September 2023. Note that this is the date of last access - not the same as the date these records were last updated.
+Data in both the dataset_B and dataset_D subdirectories - which contain the output of scripts 3a and 3b - were generated using birth/death records last obtained in September 2023. Note that this is the date of last access - not the same as the date these records were last updated. Reminder: these records inform the dataset published in [Bush 2024](https://doi.org/10.5195/names.2024.2543). This is not the most recent version - see "important note 2", above.
 
 _Birth records:_
 
